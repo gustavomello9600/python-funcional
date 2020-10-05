@@ -1,30 +1,27 @@
-head = lambda s: s[0]
-tail = lambda s: s[1:]
+from toolz import cons, take, first
+
 
 árvore = [1, [[2], 3], [4], 5, [6, 100, [[7], [[8]], 9]], 10]
 
 
 def planificar(árvore):
     for ramo in árvore:
-        if isinstance(ramo, list):
-            yield from planificar(ramo)
-        else:
-            yield ramo
+        if isinstance(ramo, list): yield from planificar(ramo)
+        else: yield ramo
 
-            
+
 assert sum(planificar(árvore)) == 155
 
 
-def somar_árvore(L):
-    if L: head(L)
-    else: return 0
-    
-    if isinstance(head(L), list):
-        return somar_árvore(head(L)) + somar_árvore(tail(L))
-    else:
-        return head(L) + somar_árvore(tail(L))
+def somar_árvore(árvore):
+    if len(árvore) == 0: return 0
 
-    
+    if isinstance(árvore[0], list):
+        return somar_árvore(árvore[0]) + somar_árvore(árvore[1:])
+    else:
+        return árvore[0] + somar_árvore(árvore[1:])
+
+
 assert somar_árvore(árvore) == 155
 
 
@@ -37,3 +34,18 @@ def profundidade(árvore):
 
 
 assert max(profundidade(árvore)) == 5
+
+
+def count(i=1):
+    while True:
+        yield i
+        i += 1
+
+
+def sieve(numbers):
+    p = next(numbers)
+    yield from cons(p, sieve((n for n in numbers if n % p > 0)))
+
+
+primes = sieve(count(2))
+list(take(10, primes))
